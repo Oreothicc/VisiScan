@@ -17,6 +17,7 @@ function Home() {
         {/* Visitor Section */}
         <div className="box visitor-box">
           <h2>Visitor</h2>
+          <Link to= "/register" className="button" target="_blank" rel="noopener noreferrer"> Register </Link>
           <Link to="/checkin" className="button" target="_blank" rel="noopener noreferrer">Check-In</Link>
           <Link to="/checkout" className="button" target="_blank" rel="noopener noreferrer">Check-Out</Link>
         </div>
