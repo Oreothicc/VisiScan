@@ -1,38 +1,63 @@
-.App {
+
+/* src/App.css */
+body {
+  background-color:#d8e2f7;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
   text-align: center;
+  padding: 30px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.title {
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 2.5rem;
+  color: #124a27;
+  margin-bottom: 30px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.sections {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  gap: 40px;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
-.App-link {
-  color: #61dafb;
+
+.box {
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.visitor-box {
+  background-color: #b8adf0;
+  color: #1f2937;
+}
+
+.admin-box {
+  background-color: #b8adf0;
+  color: #1f2937;
+}
+
+.button {
+  display: block;
+  background-color: #cae8f0;
+  color: #034230;
+  padding: 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.button:hover {
+  background-color: #8440e9;
 }
