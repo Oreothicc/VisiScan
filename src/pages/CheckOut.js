@@ -50,7 +50,7 @@ export default function CheckOut() {
       if (distance < 0.45 && !visitor.blacklisted) {
         console.log('Matched Visitor ID:', visitor.id);
         setMatchedVisitor(visitor);
-        setMessage(`Welcome back, ${visitor.name}! ✅`);
+        setMessage(`Thank you, ${visitor.name}! ✅`);
         matched = true;
         break;
       } else if (distance < 0.45 && visitor.blacklisted) {

@@ -30,7 +30,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from 'firebase/firestore';
 const firebaseConfig = {
-  //apiKey: "",
+  apiKey: "AIzaSyB22iwll9KIhnYSf3nu-utB0kw9IM8Q-W8",
   authDomain: "visiscan-c4e31.firebaseapp.com",
   projectId: "visiscan-c4e31",
   storageBucket: "visiscan-c4e31.firebasestorage.app",

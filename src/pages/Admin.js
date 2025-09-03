@@ -1,6 +1,5 @@
-// src/pages/Admin.js
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, query, where, onSnapshot, deleteDoc } from 'firebase/firestore';
 import db from '../firebaseConfig';
 import { FaBell } from 'react-icons/fa';
 
@@ -9,6 +8,7 @@ export default function Admin() {
   const [filter, setFilter] = useState('all');
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [pendingVisitor, setPendingVisitor] = useState(null); // For approval dialog
 
   useEffect(() => {
     const fetchVisitors = async () => {
@@ -45,12 +45,43 @@ export default function Admin() {
     fetchVisitors();
   }, []);
 
+  useEffect(() => {
+    const q = query(collection(db, 'visitors'), where('approved', '==', false));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const unapproved = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      if (unapproved.length > 0) {
+        setPendingVisitor(unapproved[0]);
+      } else {
+        setPendingVisitor(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const toggleBlacklist = async (visitorId, currentStatus) => {
     const ref = doc(db, 'visitors', visitorId);
     await updateDoc(ref, { blacklisted: !currentStatus });
     setVisitors(prev =>
       prev.map(v => v.id === visitorId ? { ...v, blacklisted: !currentStatus } : v)
     );
+  };
+
+  const handleApprove = async () => {
+    if (!pendingVisitor) return;
+    const ref = doc(db, 'visitors', pendingVisitor.id);
+    await updateDoc(ref, { approved: true });
+    alert(`Registration for ${pendingVisitor.name} approved.`);
+    setPendingVisitor(null);
+  };
+
+  const handleDeny = async () => {
+    if (!pendingVisitor) return;
+    const ref = doc(db, 'visitors', pendingVisitor.id);
+    // Delete the visitor document to deny registration
+    await deleteDoc(ref);
+    alert(`Registration for ${pendingVisitor.name} denied.`);
+    setPendingVisitor(null);
   };
 
   const filteredVisitors = visitors.filter(visitor => {
@@ -70,6 +101,38 @@ export default function Admin() {
 
   return (
     <div style={{ backgroundColor: '#fff8dc', minHeight: '100vh', padding: '30px' }}>
+      {/* Approval Dialog */}
+      {pendingVisitor && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '400px',
+            boxShadow: '0 0 10px rgba(0,0,0,0.3)',
+            textAlign: 'center'
+          }}>
+            <h3>{pendingVisitor.name} is trying to register for {pendingVisitor.whoAreYou}</h3>
+            <div style={{ marginTop: '20px' }}>
+              <button onClick={handleApprove} style={{ ...buttonStyle, marginRight: '10px', backgroundColor: '#4ade80' }}>
+                Approve
+              </button>
+              <button onClick={handleDeny} style={{ ...buttonStyle, backgroundColor: '#f87171' }}>
+                Deny
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ fontSize: '28px', color: '#d97706' }}>Admin Dashboard</h2>
         <div
@@ -120,11 +183,11 @@ export default function Admin() {
       </div>
 
       <table style={{ width: '100%', backgroundColor: '#fef3c7', borderCollapse: 'collapse', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
-        <thead>
+        {/* <thead>
           <tr style={{ backgroundColor: '#fde68a' }}>
             <th style={thStyle}>Name</th>
             <th style={thStyle}>Email</th>
-            <th style={thStyle}>Who</th>
+            <th style={thStyle}>Purpose</th>
             <th style={thStyle}>Check-In Time</th>
             <th style={thStyle}>Check-Out Time</th>
             <th style={thStyle}>Feedback</th>
@@ -165,7 +228,59 @@ export default function Admin() {
               </td>
             </tr>
           ))}
-        </tbody>
+        </tbody> */}
+        <thead>
+  <tr style={{ backgroundColor: '#fde68a' }}>
+    <th style={thStyle}>Name</th>
+    <th style={thStyle}>Email</th>
+    <th style={thStyle}>Purpose</th>
+    <th style={thStyle}>Check-In Date</th> {/* New column */}
+    <th style={thStyle}>Check-In Time</th>
+    <th style={thStyle}>Check-Out Time</th>
+    <th style={thStyle}>Feedback</th>
+    <th style={thStyle}>Blacklist</th>
+  </tr>
+</thead>
+<tbody>
+  {filteredVisitors.map(visitor => (
+    <tr key={visitor.id}>
+      <td style={tdStyle}>{visitor.name}</td>
+      <td style={tdStyle}>{visitor.email}</td>
+      <td style={tdStyle}>{visitor.whoAreYou}</td>
+      <td style={tdStyle}>
+        {visitor.checkInTime?.seconds
+          ? new Date(visitor.checkInTime.seconds * 1000).toLocaleDateString()
+          : '—'}
+      </td>
+      <td style={tdStyle}>
+        {visitor.checkInTime?.seconds
+          ? new Date(visitor.checkInTime.seconds * 1000).toLocaleTimeString()
+          : '—'}
+      </td>
+      <td style={tdStyle}>
+        {visitor.checkOutTime?.seconds
+          ? new Date(visitor.checkOutTime.seconds * 1000).toLocaleTimeString()
+          : '—'}
+      </td>
+      <td style={tdStyle}>{visitor.feedback || '—'}</td>
+      <td style={tdStyle}>
+        <button
+          onClick={() => toggleBlacklist(visitor.id, visitor.blacklisted || false)}
+          style={{
+            padding: '4px 8px',
+            backgroundColor: visitor.blacklisted ? '#dc2626' : '#facc15',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          {visitor.blacklisted ? 'Remove' : 'Add'}
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
       </table>
     </div>
   );
