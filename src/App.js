@@ -14,7 +14,6 @@ function Home() {
     <div className="container">
       <h1 className="title">VisiScan <br /> Visitor Management System</h1>
       <div className="sections">
-        {/* Visitor Section */}
         <div className="box visitor-box">
           <h2>Visitor</h2>
           <Link to= "/register" className="button" target="_blank" rel="noopener noreferrer"> Register </Link>
@@ -22,7 +21,6 @@ function Home() {
           <Link to="/checkout" className="button" target="_blank" rel="noopener noreferrer">Check-Out</Link>
         </div>
 
-        {/* Admin Section */}
         <div className="box admin-box">
           <h2>Admin</h2>
           <Link to="/admin-login" className="button" target="_blank" rel="noopener noreferrer">Admin Dashboard</Link>
