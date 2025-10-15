@@ -8,6 +8,10 @@ import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
 import Setup from './pages/Setup';
 import LogGeneration from './pages/LogGeneration';
+import FloorPlan from './pages/FloorPlan';
+
+// Inside <Routes>:
+
 
 
 
@@ -47,6 +51,7 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/setup" element={<Setup />} />
         <Route path="/log/:id" element={<LogGeneration />} />
+        <Route path="/floorplan" element={<FloorPlan />} />
       </Routes>
     </Router>
   );

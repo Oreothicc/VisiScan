@@ -3,6 +3,10 @@ import { collection, getDocs, updateDoc, doc, query, where, onSnapshot, deleteDo
 import db from '../firebaseConfig';
 import { FaBell } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, ResponsiveContainer, PieChart, Pie, Cell
+} from 'recharts';
+
 
 
 export default function Admin() {
@@ -13,6 +17,20 @@ export default function Admin() {
   const [pendingVisitor, setPendingVisitor] = useState(null); 
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const [hoveredRoom, setHoveredRoom] = useState(null);
+
+const rooms = [
+  { name: 'Reception', top: '20%', left: '17%', width: '20%', height: '10%' },
+    { name: 'Conference Room', top: '20%', left: '63%', width: '20%', height: '17%' },
+    { name: 'Lab', top: '65%', left: '25%', width: '15%', height: '15%' },
+    { name: 'Office', top: '55%', left: '68%', width: '15%', height: '15%' },
+];
+
+// Replace this with however you store room info in Firestore
+const getVisitorsInRoom = (roomName) => {
+  return visitors.filter(v => v.checkInLocation === roomName && !v.checkOutTime);
+};
+
 
   useEffect(() => {
     const fetchVisitors = async () => {
@@ -109,6 +127,36 @@ export default function Admin() {
   };
 
 
+  // ---------- Analytics Computation ----------
+const [dailyData, setDailyData] = useState([]);
+const [blacklistTrend, setBlacklistTrend] = useState([]);
+
+useEffect(() => {
+  if (visitors.length === 0) return;
+
+  // Visitor count per day
+  const countsByDate = {};
+  visitors.forEach(v => {
+    if (v.checkInTime?.seconds) {
+      const date = new Date(v.checkInTime.seconds * 1000).toLocaleDateString();
+      countsByDate[date] = (countsByDate[date] || 0) + 1;
+    }
+  });
+  const formattedDailyData = Object.entries(countsByDate).map(([date, count]) => ({ date, count }));
+  setDailyData(formattedDailyData);
+
+  // Blacklisted visitors over time
+  const blacklistCounts = {};
+  visitors.forEach(v => {
+    if (v.blacklisted && v.checkInTime?.seconds) {
+      const date = new Date(v.checkInTime.seconds * 1000).toLocaleDateString();
+      blacklistCounts[date] = (blacklistCounts[date] || 0) + 1;
+    }
+  });
+  const formattedBlacklistData = Object.entries(blacklistCounts).map(([date, count]) => ({ date, count }));
+  setBlacklistTrend(formattedBlacklistData);
+}, [visitors]);
+
 
   return (
     <div style={{ backgroundColor: '#fff8dc', minHeight: '100vh', padding: '30px' }}>
@@ -187,6 +235,22 @@ export default function Admin() {
     </button>
   </div>
 
+  {/* <button
+  onClick={() => navigate("/floorplan")}
+  style={{
+    padding: "8px 16px",
+    backgroundColor: "#60a5fa",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "bold"
+  }}
+>
+  Floor Plan
+</button> */}
+
+
   <h2 style={{ margin: 0, fontSize: "22px", fontWeight: "600" }}>
     Admin Dashboard
   </h2>
@@ -255,6 +319,114 @@ export default function Admin() {
           }}
         />
       </div>
+
+      {/* ---------- Analytics Dashboard ---------- */}
+<div style={{
+  marginTop: '40px',
+  marginBottom: '40px',
+  backgroundColor: '#fff8dc',
+  padding: '20px',
+  borderRadius: '8px',
+  boxShadow: '0 0 10px rgba(0,0,0,0.1)'
+}}>
+  <h3 style={{ color: '#b45309', marginBottom: '20px' }}>📊 Real-Time Analytics Dashboard</h3>
+
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+    {/* Daily Visitor Count */}
+    <div>
+      <h4 style={{ color: '#78350f' }}>Visitors Per Day</h4>
+      <ResponsiveContainer width="100%" height={250}>
+        <LineChart data={dailyData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="count" stroke="#d97706" strokeWidth={3} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+
+    {/* Blacklisted Visitors Trend */}
+    <div>
+      <h4 style={{ color: '#78350f' }}>Blacklisted Visitors Over Time</h4>
+      <ResponsiveContainer width="100%" height={250}>
+        <BarChart data={blacklistTrend}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="count" fill="#dc2626" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+</div>
+
+<div style={{ position: 'relative', width: '100%', textAlign: 'center', padding: '20px' }}>
+  <h2 style={{ color: '#b45309', marginBottom: '10px' }}>🏢 Floor Plan Overview</h2>
+  <p style={{ color: '#92400e' }}>Hover over a room</p>
+
+  <div style={{ position: 'relative', display: 'inline-block' }}>
+    <img
+      src="/floorplan.png"
+      alt="Floor Plan"
+      style={{ width: '900px', borderRadius: '10px', boxShadow: '0 0 8px rgba(0,0,0,0.2)' }}
+    />
+
+    {rooms.map(room => (
+      <div
+        key={room.name}
+        onMouseEnter={() => setHoveredRoom(room.name)}
+        onMouseLeave={() => setHoveredRoom(null)}
+        style={{
+          position: 'absolute',
+          top: room.top,
+          left: room.left,
+          width: room.width,
+          height: room.height,
+          backgroundColor: 'rgba(217,119,6,0.3)',
+          border: '2px solid #d97706',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease'
+        }}
+      >
+        {hoveredRoom === room.name && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '-90px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: 'white',
+              padding: '10px',
+              borderRadius: '8px',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+              zIndex: 10,
+              minWidth: '180px'
+            }}
+          >
+            <h4 style={{ margin: '0 0 6px 0', color: '#d97706' }}>{room.name}</h4>
+            {getVisitorsInRoom(room.name).length > 0 ? (
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {getVisitorsInRoom(room.name).map(v => (
+                  <li key={v.id} style={{ fontSize: '14px', color: '#78350f' }}>
+                    {v.name}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p style={{ fontSize: '13px', color: '#a16207' }}>No visitors inside</p>
+            )}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
 
       <table style={{ width: '100%', backgroundColor: '#fef3c7', borderCollapse: 'collapse', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
         <thead>
