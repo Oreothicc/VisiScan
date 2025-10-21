@@ -4,6 +4,8 @@ import db from '../firebaseConfig';
 import { collection, getDocs, doc, updateDoc, Timestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
+ import { arrayUnion } from 'firebase/firestore';
+
 
 export default function CheckIn() {
   const videoRef = useRef(null);
@@ -78,12 +80,20 @@ export default function CheckIn() {
       alert("❌ This device has not been configured.\nPlease reach out to the administrator for help.");
       return; 
     }
+
+
       await updateDoc(doc(db, 'visitors', matchedVisitor.id), {
         checkInTime: Timestamp.now(),
         expectedCheckOutTime: expectedTime,
         reminderSent: false,
-        checkInLocation: deviceLocation 
+        checkInLocation: deviceLocation,
+        locationHistory: arrayUnion({
+          type: 'check-in',
+          location: deviceLocation,
+          time: Timestamp.now()
+        })
       });
+
 
       const [hours, minutes] = expectedTime.split(":").map(Number);
       const now = new Date();

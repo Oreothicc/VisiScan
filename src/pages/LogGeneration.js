@@ -32,14 +32,22 @@ export default function LogGeneration() {
     return [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
   }
 
-  let totalTime = '—';
-  if (visitor.checkInTime?.seconds && visitor.checkOutTime?.seconds) {
-    const checkIn = visitor.checkInTime.seconds * 1000;
-    const checkOut = visitor.checkOutTime.seconds * 1000;
-    totalTime = msToTime(checkOut - checkIn);
-  } else if (visitor.checkInTime?.seconds && !visitor.checkOutTime?.seconds) {
-    totalTime = 'Still inside';
+ let totalTime = '—';
+
+if (visitor.checkInTime?.seconds && visitor.checkOutTime?.seconds) {
+  const checkIn = visitor.checkInTime.seconds * 1000;
+  const checkOut = visitor.checkOutTime.seconds * 1000;
+  const diff = checkOut - checkIn;
+
+  if (diff >= 0) {
+    totalTime = msToTime(diff);
+  } else {
+    totalTime = '—'; // Prevent negative duration bug
   }
+} else if (visitor.checkInTime?.seconds && !visitor.checkOutTime?.seconds) {
+  totalTime = 'Still inside';
+}
+
 
   return (
 
@@ -69,9 +77,103 @@ export default function LogGeneration() {
         <p><strong>Purpose:</strong> {visitor.whoAreYou}</p>
       </SectionBox>
 
-      <SectionBox title="Locations">
-        <p>{visitor.checkInLocation || '—'}</p>
-      </SectionBox>
+     <SectionBox title="Visited Locations">
+  {visitor.locationHistory && visitor.locationHistory.length > 0 ? (
+    (() => {
+      // Sort history by timestamp ascending
+      const sortedHistory = [...visitor.locationHistory].sort(
+        (a, b) => a.time.seconds - b.time.seconds
+      );
+
+      // Pair check-ins and check-outs by order and same location
+      const pairedVisits = [];
+      let lastCheckIn = null;
+
+      for (const entry of sortedHistory) {
+        if (entry.type === "check-in") {
+          lastCheckIn = entry;
+        } else if (entry.type === "check-out" && lastCheckIn) {
+          // Only pair if same location, else treat separately
+          if (entry.location === lastCheckIn.location) {
+            pairedVisits.push({
+              location: entry.location,
+              checkIn: lastCheckIn.time,
+              checkOut: entry.time,
+            });
+            lastCheckIn = null;
+          } else {
+            // If mismatched location, record as standalone check-out
+            pairedVisits.push({
+              location: entry.location,
+              checkIn: null,
+              checkOut: entry.time,
+            });
+          }
+        }
+      }
+
+      // If last check-in without checkout, record it too
+      if (lastCheckIn) {
+        pairedVisits.push({
+          location: lastCheckIn.location,
+          checkIn: lastCheckIn.time,
+          checkOut: null,
+        });
+      }
+
+      // Helper for formatting time
+      const formatDate = (ts) =>
+        ts ? new Date(ts.seconds * 1000).toLocaleString() : "—";
+
+      // Helper for time difference
+      const msToTime = (ms) => {
+        if (ms < 0) return "—"; // Prevent negative time bug
+        const seconds = Math.floor(ms / 1000);
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
+      };
+
+      return (
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ backgroundColor: "#fde68a" }}>
+              <th style={thStyle}>Location</th>
+              <th style={thStyle}>Check-In</th>
+              <th style={thStyle}>Check-Out</th>
+              <th style={thStyle}>Time Spent</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pairedVisits.map((v, idx) => {
+              const checkInTime = v.checkIn ? v.checkIn.seconds * 1000 : null;
+              const checkOutTime = v.checkOut ? v.checkOut.seconds * 1000 : null;
+              const timeSpent =
+                checkInTime && checkOutTime
+                  ? msToTime(checkOutTime - checkInTime)
+                  : v.checkIn && !v.checkOut
+                  ? "Still inside"
+                  : "—";
+
+              return (
+                <tr key={idx}>
+                  <td style={tdStyle}>{v.location}</td>
+                  <td style={tdStyle}>{formatDate(v.checkIn)}</td>
+                  <td style={tdStyle}>{formatDate(v.checkOut)}</td>
+                  <td style={tdStyle}>{timeSpent}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      );
+    })()
+  ) : (
+    <p>— No locations recorded —</p>
+  )}
+</SectionBox>
+
 
       <SectionBox title="Logs">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>

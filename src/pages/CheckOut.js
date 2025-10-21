@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as faceapi from 'face-api.js';
 import db from '../firebaseConfig';
 import { collection, getDocs, doc, updateDoc, Timestamp } from 'firebase/firestore';
-
+import { arrayUnion } from 'firebase/firestore';
 export default function CheckOut() {
   const videoRef = useRef(null);
   const [message, setMessage] = useState('');
@@ -73,11 +73,20 @@ export default function CheckOut() {
 
     try {
       const visitorRef = doc(db, 'visitors', matchedVisitor.id);
-      await updateDoc(visitorRef, {
-        checkOutTime: Timestamp.now(),
-        feedback: feedback,
-        checkOutLocation: localStorage.getItem('deviceLocation') || 'Unknown'
-      });
+      
+const checkoutLocation = localStorage.getItem('deviceLocation') || 'Unknown';
+
+await updateDoc(visitorRef, {
+  checkOutTime: Timestamp.now(),
+  feedback: feedback,
+  checkOutLocation: checkoutLocation,
+  locationHistory: arrayUnion({
+    type: 'check-out',
+    location: checkoutLocation,
+    time: Timestamp.now()
+  })
+});
+
 
       alert('Checked out successfully! ✅');
       setMatchedVisitor(null);
