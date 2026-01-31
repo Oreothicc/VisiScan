@@ -7,7 +7,10 @@ import Feedback from './pages/Feedback';
 import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
 import Setup from './pages/Setup';
+<<<<<<< HEAD
 import DailyReport from './pages/DailyReport';
+=======
+>>>>>>> fea4b3eca04f677bddfe6a2f2de70cf453fc05b8
 import LogGeneration from './pages/LogGeneration';
 import FloorPlan from './pages/FloorPlan';
 
@@ -52,7 +55,10 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/setup" element={<Setup />} />
         <Route path="/log/:id" element={<LogGeneration />} />
+<<<<<<< HEAD
         <Route path="/dailyreport" element={<DailyReport/>} />
+=======
+>>>>>>> fea4b3eca04f677bddfe6a2f2de70cf453fc05b8
         <Route path="/floorplan" element={<FloorPlan />} />
       </Routes>
     </Router>

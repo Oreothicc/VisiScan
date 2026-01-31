@@ -26,6 +26,10 @@ const rooms = [
     { name: 'Office', top: '55%', left: '68%', width: '15%', height: '15%' },
 ];
 
+<<<<<<< HEAD
+=======
+// Replace this with however you store room info in Firestore
+>>>>>>> fea4b3eca04f677bddfe6a2f2de70cf453fc05b8
 const getVisitorsInRoom = (roomName) => {
   return visitors.filter(v => v.checkInLocation === roomName && !v.checkOutTime);
 };
@@ -232,6 +236,7 @@ useEffect(() => {
     >
       Setup
     </button>
+<<<<<<< HEAD
 
   <button onClick={() => navigate("/dailyreport")}
      style={{
@@ -249,6 +254,26 @@ useEffect(() => {
 
   </div>
 
+=======
+  </div>
+
+  {/* <button
+  onClick={() => navigate("/floorplan")}
+  style={{
+    padding: "8px 16px",
+    backgroundColor: "#60a5fa",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "bold"
+  }}
+>
+  Floor Plan
+</button> */}
+
+
+>>>>>>> fea4b3eca04f677bddfe6a2f2de70cf453fc05b8
   <h2 style={{ margin: 0, fontSize: "22px", fontWeight: "600" }}>
     Admin Dashboard
   </h2>
@@ -318,6 +343,7 @@ useEffect(() => {
         />
       </div>
 
+<<<<<<< HEAD
 
 {/* ---------- Glassmorphism Analytics Dashboard ---------- */}
 <div style={{
@@ -392,10 +418,36 @@ useEffect(() => {
             dot={{ r: 3 }}
             activeDot={{ r: 6 }}
           />
+=======
+      {/* ---------- Analytics Dashboard ---------- */}
+<div style={{
+  marginTop: '40px',
+  marginBottom: '40px',
+  backgroundColor: '#fff8dc',
+  padding: '20px',
+  borderRadius: '8px',
+  boxShadow: '0 0 10px rgba(0,0,0,0.1)'
+}}>
+  <h3 style={{ color: '#b45309', marginBottom: '20px' }}>📊 Real-Time Analytics Dashboard</h3>
+
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+    {/* Daily Visitor Count */}
+    <div>
+      <h4 style={{ color: '#78350f' }}>Visitors Per Day</h4>
+      <ResponsiveContainer width="100%" height={250}>
+        <LineChart data={dailyData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="count" stroke="#d97706" strokeWidth={3} />
+>>>>>>> fea4b3eca04f677bddfe6a2f2de70cf453fc05b8
         </LineChart>
       </ResponsiveContainer>
     </div>
 
+<<<<<<< HEAD
     {/* Blacklist Chart Glass Card */}
     <div style={{
       padding: '20px',
@@ -446,6 +498,25 @@ useEffect(() => {
 </div>
 
 
+=======
+    {/* Blacklisted Visitors Trend */}
+    <div>
+      <h4 style={{ color: '#78350f' }}>Blacklisted Visitors Over Time</h4>
+      <ResponsiveContainer width="100%" height={250}>
+        <BarChart data={blacklistTrend}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="count" fill="#dc2626" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+</div>
+
+>>>>>>> fea4b3eca04f677bddfe6a2f2de70cf453fc05b8
 <div style={{ position: 'relative', width: '100%', textAlign: 'center', padding: '20px' }}>
   <h2 style={{ color: '#b45309', marginBottom: '10px' }}>🏢 Floor Plan Overview</h2>
   <p style={{ color: '#92400e' }}>Hover over a room</p>
