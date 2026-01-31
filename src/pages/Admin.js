@@ -26,7 +26,10 @@ const rooms = [
     { name: 'Office', top: '55%', left: '68%', width: '15%', height: '15%' },
 ];
 
+<<<<<<< HEAD
+=======
 // Replace this with however you store room info in Firestore
+>>>>>>> fea4b3eca04f677bddfe6a2f2de70cf453fc05b8
 const getVisitorsInRoom = (roomName) => {
   return visitors.filter(v => v.checkInLocation === roomName && !v.checkOutTime);
 };
@@ -233,6 +236,25 @@ useEffect(() => {
     >
       Setup
     </button>
+<<<<<<< HEAD
+
+  <button onClick={() => navigate("/dailyreport")}
+     style={{
+        padding: "8px 16px",
+        backgroundColor: "#4ade80",
+        color: "white",
+        border: "none",
+        borderRadius: "6px",
+        cursor: "pointer",
+        fontWeight: "bold"
+      }}
+    >
+  Reports
+</button>
+
+  </div>
+
+=======
   </div>
 
   {/* <button
@@ -251,6 +273,7 @@ useEffect(() => {
 </button> */}
 
 
+>>>>>>> fea4b3eca04f677bddfe6a2f2de70cf453fc05b8
   <h2 style={{ margin: 0, fontSize: "22px", fontWeight: "600" }}>
     Admin Dashboard
   </h2>
@@ -320,6 +343,82 @@ useEffect(() => {
         />
       </div>
 
+<<<<<<< HEAD
+
+{/* ---------- Glassmorphism Analytics Dashboard ---------- */}
+<div style={{
+  marginTop: '40px',
+  marginBottom: '40px',
+  padding: '32px',
+  borderRadius: '16px',
+  background: 'rgba(255,255,255,0.25)',
+  backdropFilter: 'blur(14px)',
+  WebkitBackdropFilter: 'blur(14px)',
+  border: '1px solid rgba(255,255,255,0.3)',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.15)'
+}}>
+  <h3 style={{
+    color: '#0f172a',
+    marginBottom: '28px',
+    fontSize: '22px',
+    fontWeight: '600',
+    letterSpacing: '0.2px'
+  }}>
+    📊 Real-Time Analytics Dashboard
+  </h3>
+
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '28px'
+  }}>
+
+    {/* Visitors Chart Glass Card */}
+    <div style={{
+      padding: '20px',
+      borderRadius: '14px',
+      background: 'rgba(255,255,255,0.35)',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255,255,255,0.4)',
+      boxShadow: '0 6px 24px rgba(0,0,0,0.12)'
+    }}>
+      <h4 style={{
+        color: '#1e293b',
+        marginBottom: '18px',
+        fontWeight: '600'
+      }}>
+        Visitors Per Day
+      </h4>
+
+      <ResponsiveContainer width="100%" height={260}>
+        <LineChart data={dailyData}>
+          <CartesianGrid stroke="rgba(148,163,184,0.25)" vertical={false} />
+          <XAxis
+            dataKey="date"
+            stroke="#475569"
+            tick={{ fontSize: 12 }}
+          />
+          <YAxis
+            stroke="#475569"
+            tick={{ fontSize: 12 }}
+          />
+          <Tooltip
+            contentStyle={{
+              background: 'rgba(255,255,255,0.85)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: '10px',
+              border: '1px solid rgba(255,255,255,0.5)'
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="count"
+            stroke="#3b82f6"
+            strokeWidth={2.5}
+            dot={{ r: 3 }}
+            activeDot={{ r: 6 }}
+          />
+=======
       {/* ---------- Analytics Dashboard ---------- */}
 <div style={{
   marginTop: '40px',
@@ -343,10 +442,63 @@ useEffect(() => {
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="count" stroke="#d97706" strokeWidth={3} />
+>>>>>>> fea4b3eca04f677bddfe6a2f2de70cf453fc05b8
         </LineChart>
       </ResponsiveContainer>
     </div>
 
+<<<<<<< HEAD
+    {/* Blacklist Chart Glass Card */}
+    <div style={{
+      padding: '20px',
+      borderRadius: '14px',
+      background: 'rgba(255,255,255,0.35)',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255,255,255,0.4)',
+      boxShadow: '0 6px 24px rgba(0,0,0,0.12)'
+    }}>
+      <h4 style={{
+        color: '#1e293b',
+        marginBottom: '18px',
+        fontWeight: '600'
+      }}>
+        Blacklisted Visitors Over Time
+      </h4>
+
+      <ResponsiveContainer width="100%" height={260}>
+        <BarChart data={blacklistTrend}>
+          <CartesianGrid stroke="rgba(148,163,184,0.25)" vertical={false} />
+          <XAxis
+            dataKey="date"
+            stroke="#475569"
+            tick={{ fontSize: 12 }}
+          />
+          <YAxis
+            stroke="#475569"
+            tick={{ fontSize: 12 }}
+          />
+          <Tooltip
+            contentStyle={{
+              background: 'rgba(255,255,255,0.85)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: '10px',
+              border: '1px solid rgba(255,255,255,0.5)'
+            }}
+          />
+          <Bar
+            dataKey="count"
+            fill="#ef4444"
+            radius={[8, 8, 0, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+
+  </div>
+</div>
+
+
+=======
     {/* Blacklisted Visitors Trend */}
     <div>
       <h4 style={{ color: '#78350f' }}>Blacklisted Visitors Over Time</h4>
@@ -364,6 +516,7 @@ useEffect(() => {
   </div>
 </div>
 
+>>>>>>> fea4b3eca04f677bddfe6a2f2de70cf453fc05b8
 <div style={{ position: 'relative', width: '100%', textAlign: 'center', padding: '20px' }}>
   <h2 style={{ color: '#b45309', marginBottom: '10px' }}>🏢 Floor Plan Overview</h2>
   <p style={{ color: '#92400e' }}>Hover over a room</p>
